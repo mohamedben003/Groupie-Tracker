@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
 )
 
-// Artist represents the main artist data
+// --- Structs ---
+
 type Artist struct {
 	ID           int      `json:"id"`
 	Image        string   `json:"image"`
@@ -23,56 +23,51 @@ type Artist struct {
 	Relations    string   `json:"relations"`
 }
 
-// ArtistDetail contains all artist information for detail view
 type ArtistDetail struct {
 	Artist
-	LocationsData   *Locations
+	LocationsData    *Locations
 	ConcertDatesData *Dates
-	RelationsData   *Relations
+	RelationsData    *Relations
 }
 
-// Locations represents locations data
 type Locations struct {
 	ID        int      `json:"id"`
 	Locations []string `json:"locations"`
-	Dates     string   `json:"dates"`
 }
 
-// Dates represents concert dates data
 type Dates struct {
-	ID        int      `json:"id"`
-	Locations []string `json:"locations"`
-	Dates     string   `json:"dates"`
+	ID    int      `json:"id"`
+	Dates []string `json:"dates"`
 }
 
-// Relations represents relations data
 type Relations struct {
 	ID             int                 `json:"id"`
 	DatesLocations map[string][]string `json:"datesLocations"`
 }
 
-var artists []Artist
-var templates *template.Template
+// --- Global Variables ---
+
+var (
+	artists   []Artist
+	templates *template.Template
+)
+
+// --- Main Logic ---
 
 func main() {
-	// Load templates
 	var err error
 	templates, err = template.ParseGlob("templates/*.html")
 	if err != nil {
 		log.Fatal("Error loading templates:", err)
 	}
 
-	// Fetch artists data
-	err = fetchArtists()
-	if err != nil {
+	if err := fetchArtists(); err != nil {
 		log.Fatal("Error fetching artists:", err)
 	}
 
-	// Serve static files
 	fs := http.FileServer(http.Dir("static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	// Routes
 	http.HandleFunc("/", homeHandler)
 	http.HandleFunc("/artist/", artistHandler)
 
@@ -86,26 +81,16 @@ func fetchArtists() error {
 		return err
 	}
 	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(body, &artists)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return json.NewDecoder(resp.Body).Decode(&artists)
 }
+
+// --- Handlers ---
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
 		return
 	}
-
 	err := templates.ExecuteTemplate(w, "index.html", artists)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -118,51 +103,50 @@ func artistHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusFound)
 		return
 	}
-
-	id, err := strconv.Atoi(idStr)
+	id,err := strconv.Atoi(idStr)
 	if err != nil || id < 1 || id > len(artists) {
 		http.NotFound(w, r)
 		return
 	}
-
-	// Get the artist
-	artist := artists[id-1]
-
-	// Create ArtistDetail and fetch additional data
-	detail := ArtistDetail{Artist: artist}
-
-	// Fetch locations
-	locResp, err := http.Get(artist.Locations)
-	if err == nil {
-		defer locResp.Body.Close()
-		body, _ := ioutil.ReadAll(locResp.Body)
-		var locations Locations
-		json.Unmarshal(body, &locations)
-		detail.LocationsData = &locations
+	// Safe ID Lookup
+	var selectedArtist Artist
+	found := false
+	for _, a := range artists {
+		if a.ID == id {
+			selectedArtist = a
+			found = true
+			break
+		}
 	}
 
-	// Fetch concert dates
-	dateResp, err := http.Get(artist.ConcertDates)
-	if err == nil {
-		defer dateResp.Body.Close()
-		body, _ := ioutil.ReadAll(dateResp.Body)
-		var dates Dates
-		json.Unmarshal(body, &dates)
-		detail.ConcertDatesData = &dates
+	if !found {
+		http.NotFound(w, r)
+		return
 	}
 
-	// Fetch relations
-	relResp, err := http.Get(artist.Relations)
-	if err == nil {
-		defer relResp.Body.Close()
-		body, _ := ioutil.ReadAll(relResp.Body)
-		var relations Relations
-		json.Unmarshal(body, &relations)
-		detail.RelationsData = &relations
-	}
+	detail := ArtistDetail{Artist: selectedArtist}
 
-	err = templates.ExecuteTemplate(w, "artist.html", detail)
-	if err != nil {
+	fetchData(selectedArtist.Locations, &detail.LocationsData)
+	fetchData(selectedArtist.ConcertDates, &detail.ConcertDatesData)
+	fetchData(selectedArtist.Relations, &detail.RelationsData)
+
+	
+	if err := templates.ExecuteTemplate(w, "artist.html", detail); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+// Helper function to reduce repetitive HTTP code
+func fetchData(url string, target interface{}) error {
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("bad status: %d", resp.StatusCode)
+	}
+
+	return json.NewDecoder(resp.Body).Decode(target)
 }
