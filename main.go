@@ -126,9 +126,18 @@ func artistHandler(w http.ResponseWriter, r *http.Request) {
 
 	detail := ArtistDetail{Artist: selectedArtist}
 
-	fetchData(selectedArtist.Locations, &detail.LocationsData)
-	fetchData(selectedArtist.ConcertDates, &detail.ConcertDatesData)
-	fetchData(selectedArtist.Relations, &detail.RelationsData)
+	if err := fetchData(selectedArtist.Locations, &detail.LocationsData); err != nil {
+        log.Printf("Error fetching locations: %v", err)
+        // Continue anyway - partial data is better than nothing
+    }
+    
+    if err := fetchData(selectedArtist.ConcertDates, &detail.ConcertDatesData); err != nil {
+        log.Printf("Error fetching dates: %v", err)
+    }
+    
+    if err := fetchData(selectedArtist.Relations, &detail.RelationsData); err != nil {
+        log.Printf("Error fetching relations: %v", err)
+    }
 
 	
 	if err := templates.ExecuteTemplate(w, "artist.html", detail); err != nil {
