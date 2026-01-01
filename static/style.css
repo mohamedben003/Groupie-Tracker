@@ -1,0 +1,334 @@
+/* Spotify-like dark theme */
+:root {
+  --spotify-green: #1db954;
+  --spotify-light-green: #1ed760;
+  --spotify-dark: #121212;
+  --spotify-gray: #181818;
+  --spotify-light-gray: #282828;
+  --spotify-text: #ffffff;
+  --spotify-text-secondary: #b3b3b3;
+}
+
+body {
+  background: linear-gradient(180deg, var(--spotify-dark) 0%, #000000 100%);
+  font-family: "Circular", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: var(--spotify-text);
+  min-height: 100vh;
+}
+
+/* Navigation */
+.back-btn {
+  background: var(--spotify-light-gray);
+  border: none;
+  color: var(--spotify-text);
+  padding: 10px 20px;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.back-btn:hover {
+  background: var(--spotify-gray);
+  color: var(--spotify-green);
+  transform: translateX(-5px);
+}
+
+/* Header */
+.header-title {
+  font-size: 3rem;
+  font-weight: 900;
+  margin-bottom: 2rem;
+  background: linear-gradient(45deg, var(--spotify-green), #1ed760);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: center;
+  animation: fadeInDown 0.8s ease;
+}
+
+/* Artist Cards - Spotify Style */
+.artist-card {
+  background: var(--spotify-gray);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: none;
+  height: 100%;
+  position: relative;
+  animation: fadeInUp 0.6s ease-out;
+  animation-fill-mode: both;
+}
+
+.artist-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  background: var(--spotify-light-gray);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.artist-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--spotify-green), #1ed760);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.artist-card:hover::before {
+  transform: scaleX(1);
+}
+
+.artist-image {
+  height: 280px;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.artist-card:hover .artist-image {
+  transform: scale(1.05);
+}
+
+/* Play button overlay */
+.play-overlay {
+  position: absolute;
+  bottom: 80px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background: var(--spotify-green);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.artist-card:hover .play-overlay {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.play-overlay:hover {
+  background: var(--spotify-light-green);
+  transform: scale(1.1);
+}
+
+/* Detail Page */
+.detail-header {
+  background: linear-gradient(135deg, var(--spotify-gray), #000000);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  animation: slideInLeft 0.8s ease;
+}
+
+.detail-image {
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  transition: transform 0.5s ease;
+}
+
+.detail-image:hover {
+  transform: scale(1.03);
+}
+
+.info-badge {
+  background: rgba(29, 185, 84, 0.1);
+  color: var(--spotify-green);
+  border: 1px solid rgba(29, 185, 84, 0.3);
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+}
+
+/* Tables and Lists */
+.card {
+  background: var(--spotify-gray);
+  border: none;
+  border-radius: 15px;
+  transition: transform 0.3s ease;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
+
+.card-header {
+  background: linear-gradient(
+    90deg,
+    var(--spotify-light-gray),
+    var(--spotify-gray)
+  );
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px 15px 0 0 !important;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.list-group-item {
+  background: transparent;
+  color: var(--spotify-text-secondary);
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 1rem 1.25rem;
+  transition: all 0.2s ease;
+}
+
+.list-group-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--spotify-text);
+  padding-left: 1.5rem;
+}
+
+/* Table styling */
+.table {
+  color: var(--spotify-text-secondary);
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.table-hover tbody tr:hover {
+  background: rgba(29, 185, 84, 0.1);
+  color: var(--spotify-text);
+}
+
+.badge {
+  background: rgba(29, 185, 84, 0.2);
+  color: var(--spotify-green);
+  border-radius: 12px;
+  padding: 6px 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.badge:hover {
+  background: rgba(29, 185, 84, 0.3);
+  transform: scale(1.05);
+}
+
+/* Button styling */
+.btn-primary {
+  background: var(--spotify-green);
+  border: none;
+  border-radius: 25px;
+  padding: 10px 25px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: var(--spotify-light-green);
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(29, 185, 84, 0.3);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Stagger animations for cards */
+.artist-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.artist-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.artist-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.artist-card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.artist-card:nth-child(5) {
+  animation-delay: 0.5s;
+}
+.artist-card:nth-child(6) {
+  animation-delay: 0.6s;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .artist-image {
+    height: 200px;
+  }
+
+  .header-title {
+    font-size: 2rem;
+  }
+
+  .detail-header {
+    text-align: center;
+  }
+}
+
+/* Spotify-like loading animation */
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top: 3px solid var(--spotify-green);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{.Name}} - Spotify Style</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="container mt-4">
+      <a href="/" class="back-btn mb-4">
+        <i class="fas fa-chevron-left"></i> Back to Artists
+      </a>
+
+      <div class="row detail-header">
+        <div class="col-md-4">
+          <img
+            src="{{.Image}}"
+            class="img-fluid detail-image"
+            alt="{{.Name}}"
+          />
+        </div>
+        <div class="col-md-8 d-flex flex-column justify-content-center">
+          <h2 class="display-4 fw-bold mb-3">{{.Name}}</h2>
+          <div class="d-flex flex-wrap gap-3 mb-3">
+            <span class="info-badge">
+              <i class="fas fa-calendar me-1"></i>Since {{.CreationDate}}
+            </span>
+            <span class="info-badge">
+              <i class="fas fa-compact-disc me-1"></i>{{.FirstAlbum}}
+            </span>
+            <span class="info-badge">
+              <i class="fas fa-users me-1"></i>{{len .Members}} Members
+            </span>
+          </div>
+          <button class="btn btn-primary align-self-start px-4 py-2">
+            <i class="fas fa-play me-2"></i> Play Artist
+          </button>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="card h-100" style="animation-delay: 0.1s">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <i class="fas fa-user-friends me-2"></i>Band Members
+              </h5>
+            </div>
+            <div class="card-body">
+              <ul class="list-group list-group-flush">
+                {{range .Members}}
+                <li class="list-group-item">
+                  <i class="fas fa-user-circle me-3 text-spotify-green"></i
+                  >{{.}}
+                </li>
+                {{end}}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {{if .LocationsData}}
+        <div class="col-lg-4">
+          <div class="card h-100" style="animation-delay: 0.2s">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <i class="fas fa-globe-americas me-2"></i>Tour Locations
+              </h5>
+            </div>
+            <div class="card-body">
+              <ul class="list-group list-group-flush">
+                {{range .LocationsData.Locations}}
+                <li class="list-group-item">
+                  <i class="fas fa-map-marker-alt me-3 text-danger"></i>{{.}}
+                </li>
+                {{end}}
+              </ul>
+            </div>
+          </div>
+        </div>
+        {{end}} {{if .RelationsData}}
+        <div class="col-lg-8">
+          <div class="card" style="animation-delay: 0.3s">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <i class="fas fa-calendar-alt me-2"></i>Concert Schedule
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th><i class="fas fa-map-pin me-2"></i>Location</th>
+                      <th><i class="fas fa-clock me-2"></i>Dates</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{range $location, $dates := .RelationsData.DatesLocations}}
+                    <tr>
+                      <td class="fw-bold">{{$location}}</td>
+                      <td>
+                        {{range $dates}}
+                        <span class="badge me-1 mb-1">{{.}}</span>
+                        {{end}}
+                      </td>
+                    </tr>
+                    {{end}}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        {{end}}
+      </div>
+    </div>
+
+    <!-- Background animation -->
+    <div class="gradient-bg"></div>
+
+    <style>
+      .gradient-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+            circle at 20% 80%,
+            rgba(29, 185, 84, 0.1) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 20%,
+            rgba(255, 255, 255, 0.05) 0%,
+            transparent 50%
+          );
+        z-index: -1;
+        pointer-events: none;
+      }
+
+      .text-spotify-green {
+        color: var(--spotify-green);
+      }
+
+      .text-spotify-secondary {
+        color: var(--spotify-text-secondary);
+      }
+
+      .border-spotify-secondary {
+        border-color: var(--spotify-text-secondary) !important;
+      }
+    </style>
+  </body>
+</html>
