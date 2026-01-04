@@ -88,7 +88,7 @@ func fetchArtists() error {
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
-		http.NotFound(w, r)
+		render404(w)
 		return
 	}
 	err := templates.ExecuteTemplate(w, "index.html", artists)
@@ -103,9 +103,9 @@ func artistHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusFound)
 		return
 	}
-	id,err := strconv.Atoi(idStr)
+	id, err := strconv.Atoi(idStr)
 	if err != nil || id < 1 || id > len(artists) {
-		http.NotFound(w, r)
+		render404(w)
 		return
 	}
 	// Safe ID Lookup
@@ -120,28 +120,35 @@ func artistHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !found {
-		http.NotFound(w, r)
+		render404(w)
 		return
 	}
 
 	detail := ArtistDetail{Artist: selectedArtist}
 
 	if err := fetchData(selectedArtist.Locations, &detail.LocationsData); err != nil {
-        log.Printf("Error fetching locations: %v", err)
-        // Continue anyway - partial data is better than nothing
-    }
-    
-    if err := fetchData(selectedArtist.ConcertDates, &detail.ConcertDatesData); err != nil {
-        log.Printf("Error fetching dates: %v", err)
-    }
-    
-    if err := fetchData(selectedArtist.Relations, &detail.RelationsData); err != nil {
-        log.Printf("Error fetching relations: %v", err)
-    }
+		log.Printf("Error fetching locations: %v", err)
+		// Continue anyway - partial data is better than nothing
+	}
 
-	
+	if err := fetchData(selectedArtist.ConcertDates, &detail.ConcertDatesData); err != nil {
+		log.Printf("Error fetching dates: %v", err)
+	}
+
+	if err := fetchData(selectedArtist.Relations, &detail.RelationsData); err != nil {
+		log.Printf("Error fetching relations: %v", err)
+	}
+
 	if err := templates.ExecuteTemplate(w, "artist.html", detail); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func render404(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusNotFound)
+	err := templates.ExecuteTemplate(w, "404.html", nil)
+	if err != nil {
+		http.Error(w, "404 Not Found", http.StatusNotFound)
 	}
 }
 
