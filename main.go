@@ -93,7 +93,9 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	err := templates.ExecuteTemplate(w, "index.html", artists)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Printf("Template execution error: %v", err)
+		render500(w)
+		return
 	}
 }
 
@@ -140,7 +142,8 @@ func artistHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := templates.ExecuteTemplate(w, "artist.html", detail); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Printf("Template execution error: %v", err)
+		render500(w)
 	}
 }
 
@@ -149,6 +152,14 @@ func render404(w http.ResponseWriter) {
 	err := templates.ExecuteTemplate(w, "404.html", nil)
 	if err != nil {
 		http.Error(w, "404 Not Found", http.StatusNotFound)
+	}
+}
+
+func render500(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusInternalServerError)
+	err := templates.ExecuteTemplate(w, "404.html", nil)
+	if err != nil {
+		http.Error(w, "404 Internal Error", http.StatusInternalServerError)
 	}
 }
 
