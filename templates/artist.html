@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.Name}} - Groupie Trackers</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
+
 <body>
     <header>
         <div class="container">
@@ -48,8 +50,7 @@
 
         {{if .RelationsData}}
         <section class="detail-section">
-            <h2>Concert Dates & Locations</h2>
-            
+            <h2>Concert Locations & Dates </h2>
             <div class="locations-grid">
                 {{range $location, $dates := .RelationsData.DatesLocations}}
                 <div class="location-card">
@@ -76,7 +77,6 @@
             </div>
         </section>
         {{end}}
-                {{.this}}
     </main>
 
     <footer>
@@ -85,4 +85,5 @@
         </div>
     </footer>
 </body>
+
 </html>

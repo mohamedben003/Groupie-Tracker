@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 - Page Not Found | Groupie Trackers</title>
+    <title>{{.Code}} - {{.Title}} | Groupie Trackers</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 
@@ -19,10 +19,9 @@
     <main class="container">
         <div class="error-page">
             <div class="error-content">
-                <h2 class="error-title"></h2>
-                <h1 class="error-code">404</h1>
-                <h2 class="error-title">Page Not Found</h2>
-                <p class="error-message">Got lost? It seems that the page you're looking for doesn't exist.</p>
+                <h1 class="error-code">{{.Code}}</h1>
+                <h2 class="error-title">{{.Title}}</h2>
+                <p class="error-message">{{.Message}}</p>
                 <a href="/" class="error-button">Back to Home</a>
             </div>
         </div>

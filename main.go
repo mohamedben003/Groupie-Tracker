@@ -45,6 +45,14 @@ type Relations struct {
 	DatesLocations map[string][]string `json:"datesLocations"`
 }
 
+// --- Err pages ---
+
+type ErrorPageData struct {
+	Code    int
+	Title   string
+	Message string
+}
+
 // --- Global Variables ---
 
 var (
@@ -147,22 +155,6 @@ func artistHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func render404(w http.ResponseWriter) {
-	w.WriteHeader(http.StatusNotFound)
-	err := templates.ExecuteTemplate(w, "404.html", nil)
-	if err != nil {
-		http.Error(w, "404 Not Found", http.StatusNotFound)
-	}
-}
-
-func render500(w http.ResponseWriter) {
-	w.WriteHeader(http.StatusInternalServerError)
-	err := templates.ExecuteTemplate(w, "404.html", nil)
-	if err != nil {
-		http.Error(w, "404 Internal Error", http.StatusInternalServerError)
-	}
-}
-
 // Helper function to reduce repetitive HTTP code
 func fetchData(url string, target interface{}) error {
 	resp, err := http.Get(url)
@@ -176,4 +168,25 @@ func fetchData(url string, target interface{}) error {
 	}
 
 	return json.NewDecoder(resp.Body).Decode(target)
+}
+
+func renderError(w http.ResponseWriter, code int, title, message string) {
+	w.WriteHeader(code)
+	data := ErrorPageData{
+		Code:    code,
+		Title:   title,
+		Message: message,
+	}
+	err := templates.ExecuteTemplate(w, "error.html", data)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("%d %s", code, title), code)
+	}
+}
+
+func render404(w http.ResponseWriter) {
+	renderError(w, http.StatusNotFound, "Page Not Found", "Got lost? It seems that the page you're looking for doesn't exist.")
+}
+
+func render500(w http.ResponseWriter) {
+	renderError(w, http.StatusInternalServerError, "Internal Server Error", "Something went wrong on our end. Please try again later.")
 }
