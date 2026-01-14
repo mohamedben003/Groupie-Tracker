@@ -2,42 +2,31 @@ package main
 
 import (
 	"fmt"
-	"grouping_tracker/internal"
 	"log"
 	"net/http"
 
-	"grouping_tracker/internal/handlers"
-	"grouping_tracker/internal/services"
-)
-
-var (
-	artists []internal.Artist
+	"grouping_tracker/internal/api"
+	"grouping_tracker/internal/render"
+	"grouping_tracker/internal/web"
 )
 
 func main() {
-	renderer, err := handlers.NewTemplateRenderer("templates/*.html")
-	if err != nil {
+	if err := render.Init("templates/*.html"); err != nil {
 		log.Fatal("Error loading templates:", err)
 	}
 
-	svc := services.NewGroupieService(nil)
-	artists, err = svc.FetchArtists()
+	artists, err := api.FetchArtists()
 	if err != nil {
 		log.Fatal("Error fetching artists:", err)
 	}
+	web.SetArtists(artists)
 
 	fs := http.FileServer(http.Dir("static"))
-	mux := http.NewServeMux()
-	mux.Handle("/static/", http.StripPrefix("/static/", fs))
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	h := handlers.New(handlers.Config{
-		Renderer: renderer,
-		Service:  svc,
-		Artists:  artists,
-	})
-	mux.HandleFunc("/", h.Home)
-	mux.HandleFunc("/artist/", h.Artist)
+	http.HandleFunc("/", web.HomeHandler)
+	http.HandleFunc("/artist/", web.ArtistHandler)
 
 	fmt.Println("Server starting on http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", mux))
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
