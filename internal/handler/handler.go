@@ -15,6 +15,11 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		render.Render404(w)
 		return
 	}
+	if r.Method != "GET" {
+		render.Render405(w)
+		return
+	}
+
 	err := types.Templates.ExecuteTemplate(w, "index.html", types.Artists)
 	if err != nil {
 		log.Printf("Template execution error: %v", err)
@@ -24,6 +29,11 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ArtistHandler(w http.ResponseWriter, r *http.Request) {
+	
+	if r.Method != "GET" {
+		render.Render405(w)
+		return
+	}
 	idStr := r.URL.Path[len("/artist/"):]
 	if idStr == "" {
 		http.Redirect(w, r, "/", http.StatusFound)
@@ -35,7 +45,7 @@ func ArtistHandler(w http.ResponseWriter, r *http.Request) {
 		render.Render404(w)
 		return
 	}
-	
+
 	var selectedArtist types.Artist
 	found := false
 	for _, a := range types.Artists {

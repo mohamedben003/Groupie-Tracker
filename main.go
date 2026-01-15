@@ -11,7 +11,6 @@ import (
 	types "grouping_tracker/internal/types"
 )
 
-
 func main() {
 	var err error
 	types.Templates, err = template.ParseGlob("templates/*.html")
@@ -19,11 +18,12 @@ func main() {
 		log.Fatal("Error loading templates:", err)
 	}
 
-	if err := api.FetchArtists(); err != nil {
+	if err := api.FetchData("https://groupietrackers.herokuapp.com/api/artists", &types.Artists); err != nil {
 		log.Fatal("Error fetching artists:", err)
 	}
 
 	fs := http.FileServer(http.Dir("static"))
+
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	http.HandleFunc("/", handler.HomeHandler)

@@ -28,3 +28,7 @@ func Render404(w http.ResponseWriter) {
 func Render500(w http.ResponseWriter) {
 	RenderError(w, http.StatusInternalServerError, "Internal Server Error", "Something went wrong on our end. Please try again later.")
 }
+
+func Render405(w http.ResponseWriter) {
+	RenderError(w, http.StatusMethodNotAllowed, "Methode Not Allowed", "Something went wrong on our end. Please try again later.")
+}
