@@ -27,15 +27,11 @@ now go to the  http://localhost:8080 and see the web site
 ```
 ### description
 
-> this id a project that u fetch the data on a public api keys and get a json 
+> this is a project that u have to fetch the data from a public api and get a json data 
 ```
 {"artists":"https://groupietrackers.herokuapp.com/api/artists",
 "locations":"https://groupietrackers.herokuapp.com/api/locations",
 "dates":"https://groupietrackers.herokuapp.com/api/dates",
 "relation":"https://groupietrackers.herokuapp.com/api/relation"}
 ```
-> then we visualise the data propaly
-
-
-
-make this readme  better and don't complicateed at all
+> then we visualise the data properly

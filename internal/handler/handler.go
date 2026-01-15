@@ -29,11 +29,12 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ArtistHandler(w http.ResponseWriter, r *http.Request) {
-	
+
 	if r.Method != "GET" {
 		render.Render405(w)
 		return
 	}
+	
 	idStr := r.URL.Path[len("/artist/"):]
 	if idStr == "" {
 		http.Redirect(w, r, "/", http.StatusFound)
