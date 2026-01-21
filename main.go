@@ -5,9 +5,11 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 
 	api "grouping_tracker/internal/api"
 	handler "grouping_tracker/internal/handler"
+	"grouping_tracker/internal/render"
 	types "grouping_tracker/internal/types"
 )
 
@@ -24,7 +26,25 @@ func main() {
 
 	fs := http.FileServer(http.Dir("static"))
 
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
+	http.HandleFunc("/static/", func(w http.ResponseWriter, r *http.Request) {
+		path := "static" + r.URL.Path[len("/static"):]
+
+		info, err := os.Stat(path)
+		if err != nil {
+			w.WriteHeader(http.StatusNotFound)
+			render.Render404(w)
+			return
+		}
+
+		// 🚫 Block directory listing
+		if info.IsDir() {
+			w.WriteHeader(http.StatusNotFound)
+			render.Render404(w)
+			return
+		}
+
+		http.StripPrefix("/static/", fs).ServeHTTP(w, r)
+	})
 
 	http.HandleFunc("/", handler.HomeHandler)
 	http.HandleFunc("/artist/", handler.ArtistHandler)
