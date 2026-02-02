@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Groupie Trackers - Discover Artists</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
+
 <body>
     <header>
         <div class="container">
@@ -15,12 +17,99 @@
     </header>
 
     <main class="container">
-        <div class="search-section">
-            <input type="text" id="searchInput" placeholder="Search artists..." autocomplete="off">
-        </div>
+        <!-- Filter Section -->
+        <section class="filters-section">
+            <form action="/" method="GET" class="filter-form">
+                <div class="filter-header">
+                    <h2>Filter Artists</h2>
+                    <button type="submit" class="apply-btn">Apply Filters</button>
+                </div>
 
+                <div class="filter-grid">
+                    <!-- Range Filter: Creation Date -->
+                    <div class="filter-group">
+                        <label>Creation Date (Year)</label>
+
+                        <div class="double-slider-box">
+                            <div class="range-values">
+                                <!-- IDs needed for JS -->
+                                <span id="range1-display">1950</span> - <span id="range2-display">2025</span>
+                            </div>
+                            <div class="range-slider-container">
+                                <div class="slider-track"></div>
+
+                                <!-- GO INJECTION HERE: value="{{.Filters.CreationDateMin}}" -->
+                                <input type="range" name="creationDateMin" min="1950" max="2025"
+                                    value="{{if .Filters.CreationDateMin}}{{.Filters.CreationDateMin}}{{else}}1950{{end}}"
+                                    id="slider-1">
+
+                                <input type="range" name="creationDateMax" min="1950" max="2025"
+                                    value="{{if .Filters.CreationDateMax}}{{.Filters.CreationDateMax}}{{else}}2025{{end}}"
+                                    id="slider-2">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Range Filter: First Album Date -->
+                    <div class="filter-group">
+                        <label>First Album Date (Year)</label>
+                        <div class="range-container">
+                            <div class="range-inputs">
+                                <!-- GO INJECTION HERE -->
+                                <input type="number" name="firstAlbumMin" placeholder="1950" class="small-input"
+                                    value="{{if .Filters.FirstAlbumMin}}{{.Filters.FirstAlbumMin}}{{end}}">
+                                <span>to</span>
+                                <input type="number" name="firstAlbumMax" placeholder="2025" class="small-input"
+                                    value="{{if .Filters.FirstAlbumMax}}{{.Filters.FirstAlbumMax}}{{end}}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Checkbox: Members -->
+                    <!-- This is tricky in templates, requires a helper function usually. 
+                    For simplicity, we leave them unchecked on reload, or we need to add a functionMap to main.go. -->
+
+                    <!-- Checkbox Filter: Number of Members -->
+                    <div class="filter-group">
+                        <label>Number of Members</label>
+                        <div class="checkbox-grid">
+                            {{range .Artists}} <!-- Just using a loop range trick or hardcode 1-8 -->
+                            <!-- Note: Since we need specific numbers 1-8, hardcoding strictly for UI structure -->
+                            {{end}}
+                            <label class="checkbox-btn"><input type="checkbox" name="members"
+                                    value="1"><span>1</span></label>
+                            <label class="checkbox-btn"><input type="checkbox" name="members"
+                                    value="2"><span>2</span></label>
+                            <label class="checkbox-btn"><input type="checkbox" name="members"
+                                    value="3"><span>3</span></label>
+                            <label class="checkbox-btn"><input type="checkbox" name="members"
+                                    value="4"><span>4</span></label>
+                            <label class="checkbox-btn"><input type="checkbox" name="members"
+                                    value="5"><span>5</span></label>
+                            <label class="checkbox-btn"><input type="checkbox" name="members"
+                                    value="6"><span>6</span></label>
+                            <label class="checkbox-btn"><input type="checkbox" name="members"
+                                    value="7"><span>7</span></label>
+                            <label class="checkbox-btn"><input type="checkbox" name="members"
+                                    value="8"><span>8+</span></label>
+                        </div>
+                    </div>
+
+                    <!-- Location Filter -->
+                    <div class="filter-group">
+                        <label for="locationInput">Location</label>
+                        <input type="text" id="locationInput" name="location" placeholder="e.g. London, USA..."
+                            class="text-input" list="locationsList">
+                        <!-- We will populate this datalist from Go backend later -->
+                        <datalist id="locationsList"></datalist>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <!-- Artists Grid -->
         <div class="artists-grid" id="artistsGrid">
-            {{range .}}
+            {{range .Artists}}
             <article class="artist-card" data-name="{{.Name}}">
                 <a href="/artist/{{.ID}}" class="card-link">
                     <div class="card-image">
@@ -48,7 +137,7 @@
         </div>
 
         <div id="noResults" class="no-results" style="display: none;">
-            <p>No artists found matching your search.</p>
+            <p>No artists found matching your criteria.</p>
         </div>
     </main>
 
@@ -58,34 +147,50 @@
         </div>
     </footer>
 
+    <!-- Note: I removed the Client-side JS filter because you are implementing 
+         Server-side filters with Go. The form above submits to the server. -->
     <script>
-        const searchInput = document.getElementById('searchInput');
-        const artistsGrid = document.getElementById('artistsGrid');
-        const noResults = document.getElementById('noResults');
-        const artistCards = document.querySelectorAll('.artist-card');
+        // This script goes before </body>
+        window.onload = function () {
+            const slider1 = document.getElementById("slider-1");
+            const slider2 = document.getElementById("slider-2");
+            const display1 = document.getElementById("range1-display");
+            const display2 = document.getElementById("range2-display");
+            const track = document.querySelector(".slider-track");
+            const minGap = 0;
 
-        searchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase().trim();
-            let visibleCount = 0;
-
-            artistCards.forEach(card => {
-                const artistName = card.dataset.name.toLowerCase();
-                if (artistName.includes(searchTerm)) {
-                    card.style.display = 'block';
-                    visibleCount++;
-                } else {
-                    card.style.display = 'none';
+            function slideOne() {
+                if (parseInt(slider2.value) - parseInt(slider1.value) <= minGap) {
+                    slider1.value = parseInt(slider2.value) - minGap;
                 }
-            });
-
-            if (visibleCount === 0) {
-                artistsGrid.style.display = 'none';
-                noResults.style.display = 'block';
-            } else {
-                artistsGrid.style.display = 'grid';
-                noResults.style.display = 'none';
+                display1.textContent = slider1.value;
+                fillColor();
             }
-        });
+
+            function slideTwo() {
+                if (parseInt(slider2.value) - parseInt(slider1.value) <= minGap) {
+                    slider2.value = parseInt(slider1.value) + minGap;
+                }
+                display2.textContent = slider2.value;
+                fillColor();
+            }
+
+            function fillColor() {
+                const min = parseInt(slider1.min);
+                const max = parseInt(slider1.max);
+                const percent1 = ((slider1.value - min) / (max - min)) * 100;
+                const percent2 = ((slider2.value - min) / (max - min)) * 100;
+                track.style.background = `linear-gradient(to right, var(--border) ${percent1}%, var(--primary) ${percent1}%, var(--primary) ${percent2}%, var(--border) ${percent2}%)`;
+            }
+
+            slider1.addEventListener("input", slideOne);
+            slider2.addEventListener("input", slideTwo);
+
+            // Trigger once on load to set colors based on Go values
+            slideOne();
+            slideTwo();
+        };
     </script>
 </body>
+
 </html>

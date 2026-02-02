@@ -45,6 +45,11 @@ type Relations struct {
 	DatesLocations map[string][]string `json:"datesLocations"`
 }
 
+type IndexPageData struct {
+	Artists []Artist
+	Filters FilterData
+}
+
 // --- Err pages ---
 
 type ErrorPageData struct {
@@ -99,7 +104,17 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 		render404(w)
 		return
 	}
-	err := templates.ExecuteTemplate(w, "index.html", artists)
+
+	// Call the filter logic from filters.go
+	filteredArtists, currentFilters := FilterArtists(artists, r)
+
+	// Prepare the data for the template
+	data := IndexPageData{
+		Artists: filteredArtists,
+		Filters: currentFilters,
+	}
+
+	err := templates.ExecuteTemplate(w, "index.html", data)
 	if err != nil {
 		log.Printf("Template execution error: %v", err)
 		render500(w)
