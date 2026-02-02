@@ -22,7 +22,11 @@
             <form action="/" method="GET" class="filter-form">
                 <div class="filter-header">
                     <h2>Filter Artists</h2>
-                    <button type="submit" class="apply-btn">Apply Filters</button>
+                    <div class="form-actions">
+        <!-- This link reloads the page clean, effectively resetting Go's filter logic -->
+        <a href="/" class="reset-btn">Reset</a>
+        <button type="submit" class="apply-btn">Apply Filters</button>
+    </div>
                 </div>
 
                 <div class="filter-grid">
@@ -56,10 +60,10 @@
                         <div class="range-container">
                             <div class="range-inputs">
                                 <!-- GO INJECTION HERE -->
-                                <input type="number" name="firstAlbumMin" placeholder="1950" class="small-input"
+                                <input type="number" name="firstAlbumMin" placeholder="1950" class="small-input" min="1950" max="2025"
                                     value="{{if .Filters.FirstAlbumMin}}{{.Filters.FirstAlbumMin}}{{end}}">
                                 <span>to</span>
-                                <input type="number" name="firstAlbumMax" placeholder="2025" class="small-input"
+                                <input type="number" name="firstAlbumMax" placeholder="2025" class="small-input" min="1950" max="2025"
                                     value="{{if .Filters.FirstAlbumMax}}{{.Filters.FirstAlbumMax}}{{end}}">
                             </div>
                         </div>
@@ -73,9 +77,8 @@
                     <div class="filter-group">
                         <label>Number of Members</label>
                         <div class="checkbox-grid">
-                            {{range .Artists}} <!-- Just using a loop range trick or hardcode 1-8 -->
-                            <!-- Note: Since we need specific numbers 1-8, hardcoding strictly for UI structure -->
-                            {{end}}
+                            <!-- {{range .Artists}}
+                            {{end}} -->
                             <label class="checkbox-btn"><input type="checkbox" name="members"
                                     value="1"><span>1</span></label>
                             <label class="checkbox-btn"><input type="checkbox" name="members"
@@ -147,8 +150,6 @@
         </div>
     </footer>
 
-    <!-- Note: I removed the Client-side JS filter because you are implementing 
-         Server-side filters with Go. The form above submits to the server. -->
     <script>
         // This script goes before </body>
         window.onload = function () {

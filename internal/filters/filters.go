@@ -1,29 +1,25 @@
-package main
+package filters
 
 import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"grouping_tracker/internal/types"
 )
 
-// FilterData holds the values to send back to the HTML inputs
-// so they don't reset when the page reloads.
-type FilterData struct {
-	CreationDateMin int
-	CreationDateMax int
-	FirstAlbumMin   int
-	FirstAlbumMax   int
-	Members         []string
-	Location        string
-}
-
 // FilterArtists filters the list based on the form data
-func FilterArtists(artists []Artist, r *http.Request) ([]Artist, FilterData) {
-	var filtered []Artist
+func FilterArtists(artists []types.Artist, r *http.Request) ([]types.Artist, types.FilterData) {
+	var filtered []types.Artist
+
+	if r.URL.RawQuery == "" {
+		return artists, types.FilterData{}
+	}
 
 	// 1. Parse Form Data
 	if err := r.ParseForm(); err != nil {
-		return artists, FilterData{} // Return original list on error
+		// On error, return empty filter data and original list
+		return artists, types.FilterData{}
 	}
 
 	// 2. Get Form Values
@@ -32,9 +28,9 @@ func FilterArtists(artists []Artist, r *http.Request) ([]Artist, FilterData) {
 	minA, _ := strconv.Atoi(r.FormValue("firstAlbumMin"))
 	maxA, _ := strconv.Atoi(r.FormValue("firstAlbumMax"))
 	location := strings.ToLower(r.FormValue("location"))
-	members := r.Form["members"] // Checkboxes return a slice
+	members := r.Form["members"]
 
-	// Set Defaults if values are empty (0)
+	// Set Defaults
 	if minC == 0 {
 		minC = 1950
 	}
@@ -49,7 +45,7 @@ func FilterArtists(artists []Artist, r *http.Request) ([]Artist, FilterData) {
 	}
 
 	// Prepare data to send back to UI
-	filterData := FilterData{
+	filterData := types.FilterData{
 		CreationDateMin: minC,
 		CreationDateMax: maxC,
 		FirstAlbumMin:   minA,
@@ -61,13 +57,12 @@ func FilterArtists(artists []Artist, r *http.Request) ([]Artist, FilterData) {
 	// 3. Loop and Check
 	for _, a := range artists {
 
-		// --- Check 1: Creation Date ---
+		// Check 1: Creation Date
 		if a.CreationDate < minC || a.CreationDate > maxC {
 			continue
 		}
 
-		// --- Check 2: First Album Date ---
-		// API format is "DD-MM-YYYY". We want the Year (last 4 chars)
+		// Check 2: First Album Date
 		parts := strings.Split(a.FirstAlbum, "-")
 		if len(parts) == 3 {
 			year, _ := strconv.Atoi(parts[2])
@@ -76,7 +71,7 @@ func FilterArtists(artists []Artist, r *http.Request) ([]Artist, FilterData) {
 			}
 		}
 
-		// --- Check 3: Number of Members ---
+		// Check 3: Number of Members
 		if len(members) > 0 {
 			matches := false
 			currentMembers := strconv.Itoa(len(a.Members))
@@ -91,11 +86,7 @@ func FilterArtists(artists []Artist, r *http.Request) ([]Artist, FilterData) {
 			}
 		}
 
-		// --- Check 4: Location ---
-		// NOTE: In the API, "Locations" is just a URL string.
-		// You cannot filter by City name using just the basic Artist struct
-		// unless you fetch all location data on startup.
-		// For now, this is ignored or requires advanced data fetching.
+		// Check 4: Location (Pending implementation)
 
 		filtered = append(filtered, a)
 	}

@@ -435,6 +435,29 @@ input[type=number]::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.form-actions {
+    display: flex;
+    gap: 10px; /* Space between Reset and Apply */
+}
+.reset-btn {
+    display: inline-block;
+    text-decoration: none;
+    padding: 10px 20px;
+    background-color: #dc3545; /* Standard Red for Reset/Clear */
+    color: white;
+    border-radius: 5px; /* Matches standard button curves */
+    font-weight: bold;
+    font-size: 0.9rem;
+    transition: background 0.3s ease;
+}
+
+.reset-btn:hover {
+    background-color: #c82333; /* Darker red on hover */
+}
 /* Responsive */
 @media (max-width: 768px) {
     .artist-hero { grid-template-columns: 1fr; gap: 2rem; }
