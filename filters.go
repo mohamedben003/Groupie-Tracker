@@ -20,7 +20,7 @@ type FilterData struct {
 // FilterArtists filters the list based on the form data
 func FilterArtists(artists []Artist, r *http.Request) ([]Artist, FilterData) {
 	var filtered []Artist
-	
+
 	// 1. Parse Form Data
 	if err := r.ParseForm(); err != nil {
 		return artists, FilterData{} // Return original list on error
@@ -35,10 +35,18 @@ func FilterArtists(artists []Artist, r *http.Request) ([]Artist, FilterData) {
 	members := r.Form["members"] // Checkboxes return a slice
 
 	// Set Defaults if values are empty (0)
-	if minC == 0 { minC = 1950 }
-	if maxC == 0 { maxC = 2025 }
-	if minA == 0 { minA = 1950 }
-	if maxA == 0 { maxA = 2025 }
+	if minC == 0 {
+		minC = 1950
+	}
+	if maxC == 0 {
+		maxC = 2025
+	}
+	if minA == 0 {
+		minA = 1950
+	}
+	if maxA == 0 {
+		maxA = 2025
+	}
 
 	// Prepare data to send back to UI
 	filterData := FilterData{
@@ -52,7 +60,7 @@ func FilterArtists(artists []Artist, r *http.Request) ([]Artist, FilterData) {
 
 	// 3. Loop and Check
 	for _, a := range artists {
-		
+
 		// --- Check 1: Creation Date ---
 		if a.CreationDate < minC || a.CreationDate > maxC {
 			continue
@@ -84,11 +92,11 @@ func FilterArtists(artists []Artist, r *http.Request) ([]Artist, FilterData) {
 		}
 
 		// --- Check 4: Location ---
-		// NOTE: In the API, "Locations" is just a URL string. 
-		// You cannot filter by City name using just the basic Artist struct 
-		// unless you fetch all location data on startup. 
+		// NOTE: In the API, "Locations" is just a URL string.
+		// You cannot filter by City name using just the basic Artist struct
+		// unless you fetch all location data on startup.
 		// For now, this is ignored or requires advanced data fetching.
-		
+
 		filtered = append(filtered, a)
 	}
 
