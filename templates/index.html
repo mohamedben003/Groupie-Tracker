@@ -43,7 +43,6 @@
         </div>
 
         <div class="filter-grid">
-          <!-- Creation Date Filter -->
           <div class="filter-group">
             <h3 class="filter-title">
               <svg
@@ -315,7 +314,7 @@
           data-creation-date="{{.CreationDate}}"
           data-first-album="{{.FirstAlbum}}"
           data-members="{{len .Members}}"
-          data-locations="{{.Locations}}"
+          data-locations="{{range $i, $loc := .LocationsData}}{{if $i}}|{{end}}{{$loc}}{{end}}"
         >
           <a href="/artist/{{.ID}}" class="card-link">
             <div class="card-image">
@@ -417,8 +416,11 @@
       </div>
     </footer>
 
-    <script>
-      // Search functionality
+    <script type="module">
+      // Import the data from your external file
+      import dataLocation from "/static/data.js";
+
+      // Your existing script code, now with access to dataLocation
       const searchInput = document.getElementById("searchInput");
       const artistsGrid = document.getElementById("artistsGrid");
       const noResults = document.getElementById("noResults");
@@ -432,40 +434,31 @@
       const locationSearch = document.getElementById("locationSearch");
       const memberButtons = document.querySelectorAll(".member-btn");
 
-      const sampleLocations = [
-        "Texas, USA",
-        "California, USA",
-        "New York, USA",
-        "London, UK",
-        "Paris, France",
-        "Tokyo, Japan",
-        "Sydney, Australia",
-        "Berlin, Germany",
-        "Toronto, Canada",
-        "Mexico City, Mexico",
-        "Washington, USA",
-        "Florida, USA",
-        "Illinois, USA",
-        "Nevada, USA",
-        "Massachusetts, USA",
-      ];
+      // Use the imported dataLocation instead of sampleLocations
+      const allLocations = dataLocation; // This should be your array of {value, title} objects
 
       function initLocations() {
         const locationsGrid = document.getElementById("locationsGrid");
         locationsGrid.innerHTML = "";
 
-        sampleLocations.forEach((location) => {
+        // Get only unique locations (remove duplicates)
+        const uniqueLocations = Array.from(
+          new Map(allLocations.map((item) => [item.value, item])).values(),
+        );
+
+        uniqueLocations.forEach((location) => {
           const locationItem = document.createElement("div");
           locationItem.className = "location-item";
 
           const checkbox = document.createElement("input");
           checkbox.type = "checkbox";
-          checkbox.id = `loc-${location.replace(/[^a-zA-Z0-9]/g, "-")}`;
-          checkbox.value = location;
+          checkbox.id = `loc-${location.value.replace(/[^a-zA-Z0-9]/g, "-")}`;
+          checkbox.value = location.value;
+          checkbox.dataset.title = location.title;
 
           const label = document.createElement("label");
           label.htmlFor = checkbox.id;
-          label.textContent = location;
+          label.textContent = location.title;
 
           locationItem.appendChild(checkbox);
           locationItem.appendChild(label);
@@ -473,6 +466,7 @@
         });
       }
 
+      // The rest of your existing functions remain the same...
       function updateRangeDisplays() {
         const creationMin =
           document.getElementById("creationDateMin").value || "1970";
@@ -502,7 +496,6 @@
 
         // Get selected member button
         const selectedMemberBtn = document.querySelector(".member-btn.active");
-
         const selectedMemberValue = selectedMemberBtn
           ? selectedMemberBtn.dataset.value
           : null;
@@ -519,8 +512,9 @@
         artistCards.forEach((card) => {
           const artistName = card.dataset.name.toLowerCase();
           const creationDate = parseInt(card.dataset.creationDate);
-          const firstAlbum = parseInt(card.dataset.firstAlbum.split("-").pop()); // Extract year
+          const firstAlbum = parseInt(card.dataset.firstAlbum.split("-").pop());
           const members = parseInt(card.dataset.members);
+          const artistLocations = card.dataset.locations;
 
           let matches = true;
 
@@ -530,28 +524,18 @@
           }
 
           // Creation date range
-          if (creationMin && creationDate < parseInt(creationMin)) {
+          if (creationMin && creationDate < parseInt(creationMin))
             matches = false;
-          }
-          if (creationMax && creationDate > parseInt(creationMax)) {
+          if (creationMax && creationDate > parseInt(creationMax))
             matches = false;
-          }
 
           // First album range
-          if (albumMin && firstAlbum < parseInt(albumMin)) {
-            matches = false;
-          }
-          if (albumMax && firstAlbum > parseInt(albumMax)) {
-            matches = false;
-          }
+          if (albumMin && firstAlbum < parseInt(albumMin)) matches = false;
+          if (albumMax && firstAlbum > parseInt(albumMax)) matches = false;
 
           // Members filter
-          if (membersMin && members < parseInt(membersMin)) {
-            matches = false;
-          }
-          if (membersMax && members > parseInt(membersMax)) {
-            matches = false;
-          }
+          if (membersMin && members < parseInt(membersMin)) matches = false;
+          if (membersMax && members > parseInt(membersMax)) matches = false;
 
           // Member button selection
           if (selectedMemberValue) {
@@ -562,19 +546,23 @@
             }
           }
 
-          // Locations filter (placeholder - implement based on your data)
+          // Locations filter - check if artist has ANY of the selected locations
           if (selectedLocations.length > 0) {
-            // You'll need to implement location matching based on your data structure
-            // For now, this is a placeholder
-            const artistLocations = card.dataset.locations;
-            const hasLocation = selectedLocations.some(
-              (loc) =>
-                artistLocations &&
-                artistLocations.toLowerCase().includes(loc.toLowerCase()),
-            );
-            if (!hasLocation) {
-              matches = false;
+            // Parse the locations string from data attribute
+            let artistLocationArray = [];
+            try {
+              artistLocationArray = JSON.parse(artistLocations);
+            } catch (e) {
+              // If not JSON, assume it's a string representation
+              artistLocationArray = artistLocations ? [artistLocations] : [];
             }
+
+            const hasLocation = selectedLocations.some((selectedLoc) =>
+              artistLocationArray.some((artistLoc) =>
+                artistLoc.includes(selectedLoc),
+              ),
+            );
+            if (!hasLocation) matches = false;
           }
 
           // Show/hide card
@@ -630,6 +618,7 @@
         // Event listeners
         searchInput.addEventListener("input", applyFilters);
         resetFiltersBtn.addEventListener("click", resetFilters);
+
         selectAllLocationsBtn.addEventListener("click", () => {
           document
             .querySelectorAll('.location-item input[type="checkbox"]')
@@ -638,6 +627,7 @@
             });
           applyFilters();
         });
+
         clearAllLocationsBtn.addEventListener("click", () => {
           document
             .querySelectorAll('.location-item input[type="checkbox"]')
@@ -656,15 +646,8 @@
         memberButtons.forEach((btn) => {
           btn.addEventListener("click", () => {
             const isActive = btn.classList.contains("active");
-
-            // Remove active from all buttons
             memberButtons.forEach((b) => b.classList.remove("active"));
-
-            // Toggle: only re-add if it wasn't active
-            if (!isActive) {
-              btn.classList.add("active");
-            }
-
+            if (!isActive) btn.classList.add("active");
             applyFilters();
           });
         });

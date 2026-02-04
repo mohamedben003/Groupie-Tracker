@@ -5,7 +5,12 @@ import "html/template"
 var (
 	Artists   []Artist
 	Templates *template.Template
+	DataLocations LocationsResponse
 )
+
+type LocationsResponse struct {
+	Index []Locations `json:"index"`
+}
 
 type Artist struct {
 	ID           int      `json:"id"`
@@ -15,9 +20,13 @@ type Artist struct {
 	CreationDate int      `json:"creationDate"`
 	FirstAlbum   string   `json:"firstAlbum"`
 	Locations    string   `json:"locations"`
+	LocationsData []string 
 	ConcertDates string   `json:"concertDates"`
 	Relations    string   `json:"relations"`
 }
+
+
+
 
 type ArtistDetail struct {
 	Artist

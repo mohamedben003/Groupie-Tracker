@@ -20,7 +20,7 @@ func main() {
 		log.Fatal("Error loading templates:", err)
 	}
 
-	if err := api.FetchData("https://groupietrackers.herokuapp.com/api/artists", &types.Artists); err != nil {
+	if err := api.FetchStartData(); err != nil {
 		log.Fatal("Error fetching artists:", err)
 	}
 
