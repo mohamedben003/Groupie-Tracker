@@ -23,10 +23,9 @@
                 <div class="filter-header">
                     <h2>Filter Artists</h2>
                     <div class="form-actions">
-        <!-- This link reloads the page clean, effectively resetting Go's filter logic -->
-        <a href="/" class="reset-btn">Reset</a>
-        <button type="submit" class="apply-btn">Apply Filters</button>
-    </div>
+                        <a href="/" class="reset-btn">Reset</a>
+                        <button type="submit" class="apply-btn">Apply Filters</button>
+                    </div>
                 </div>
 
                 <div class="filter-grid">
@@ -41,8 +40,7 @@
                             </div>
                             <div class="range-slider-container">
                                 <div class="slider-track"></div>
-
-                                <!-- GO INJECTION HERE: value="{{.Filters.CreationDateMin}}" -->
+                                
                                 <input type="range" name="creationDateMin" min="1950" max="2025"
                                     value="{{if .Filters.CreationDateMin}}{{.Filters.CreationDateMin}}{{else}}1950{{end}}"
                                     id="slider-1">
@@ -60,41 +58,70 @@
                         <div class="range-container">
                             <div class="range-inputs">
                                 <!-- GO INJECTION HERE -->
-                                <input type="number" name="firstAlbumMin" placeholder="1950" class="small-input" min="1950" max="2025"
+                                <input type="number" name="firstAlbumMin" placeholder="1950" class="small-input"
+                                    min="1950" max="2025"
                                     value="{{if .Filters.FirstAlbumMin}}{{.Filters.FirstAlbumMin}}{{end}}">
                                 <span>to</span>
-                                <input type="number" name="firstAlbumMax" placeholder="2025" class="small-input" min="1950" max="2025"
+                                <input type="number" name="firstAlbumMax" placeholder="2025" class="small-input"
+                                    min="1950" max="2025"
                                     value="{{if .Filters.FirstAlbumMax}}{{.Filters.FirstAlbumMax}}{{end}}">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Checkbox: Members -->
-                    <!-- This is tricky in templates, requires a helper function usually. 
-                    For simplicity, we leave them unchecked on reload, or we need to add a functionMap to main.go. -->
-
                     <!-- Checkbox Filter: Number of Members -->
                     <div class="filter-group">
                         <label>Number of Members</label>
                         <div class="checkbox-grid">
-                            <!-- {{range .Artists}}
-                            {{end}} -->
-                            <label class="checkbox-btn"><input type="checkbox" name="members"
-                                    value="1"><span>1</span></label>
-                            <label class="checkbox-btn"><input type="checkbox" name="members"
-                                    value="2"><span>2</span></label>
-                            <label class="checkbox-btn"><input type="checkbox" name="members"
-                                    value="3"><span>3</span></label>
-                            <label class="checkbox-btn"><input type="checkbox" name="members"
-                                    value="4"><span>4</span></label>
-                            <label class="checkbox-btn"><input type="checkbox" name="members"
-                                    value="5"><span>5</span></label>
-                            <label class="checkbox-btn"><input type="checkbox" name="members"
-                                    value="6"><span>6</span></label>
-                            <label class="checkbox-btn"><input type="checkbox" name="members"
-                                    value="7"><span>7</span></label>
-                            <label class="checkbox-btn"><input type="checkbox" name="members"
-                                    value="8"><span>8+</span></label>
+                            <div class="checkbox-grid">
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="members" value="1" {{range .Filters.Members}}{{if eq
+                                        . "1" }}checked{{end}}{{end}}>
+                                    <span>1</span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="members" value="2" {{range .Filters.Members}}{{if eq
+                                        . "2" }}checked{{end}}{{end}}>
+                                    <span>2</span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="members" value="3" {{range .Filters.Members}}{{if eq
+                                        . "3" }}checked{{end}}{{end}}>
+                                    <span>3</span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="members" value="4" {{range .Filters.Members}}{{if eq
+                                        . "4" }}checked{{end}}{{end}}>
+                                    <span>4</span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="members" value="5" {{range .Filters.Members}}{{if eq
+                                        . "5" }}checked{{end}}{{end}}>
+                                    <span>5</span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="members" value="6" {{range .Filters.Members}}{{if eq
+                                        . "6" }}checked{{end}}{{end}}>
+                                    <span>6</span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="members" value="7" {{range .Filters.Members}}{{if eq
+                                        . "7" }}checked{{end}}{{end}}>
+                                    <span>7</span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="members" value="8" {{range .Filters.Members}}{{if eq
+                                        . "8" }}checked{{end}}{{end}}>
+                                    <span>8+</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
 
@@ -102,9 +129,7 @@
                     <div class="filter-group">
                         <label for="locationInput">Location</label>
                         <input type="text" id="locationInput" name="location" placeholder="e.g. London, USA..."
-                            class="text-input" list="locationsList">
-                        <!-- We will populate this datalist from Go backend later -->
-                        <datalist id="locationsList"></datalist>
+                            class="text-input" list="locationsList" value="{{.Filters.Location}}">
                     </div>
                 </div>
             </form>
@@ -151,7 +176,7 @@
     </footer>
 
     <script>
-        // This script goes before </body>
+        // This script is to handle the two Sliders (range)
         window.onload = function () {
             const slider1 = document.getElementById("slider-1");
             const slider2 = document.getElementById("slider-2");

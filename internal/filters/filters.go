@@ -27,8 +27,11 @@ func FilterArtists(artists []types.Artist, r *http.Request) ([]types.Artist, typ
 	maxC, _ := strconv.Atoi(r.FormValue("creationDateMax"))
 	minA, _ := strconv.Atoi(r.FormValue("firstAlbumMin"))
 	maxA, _ := strconv.Atoi(r.FormValue("firstAlbumMax"))
-	location := strings.ToLower(r.FormValue("location"))
 	members := r.Form["members"]
+	location := strings.TrimSpace(r.FormValue("location"))
+
+	//to send back the original location typed in the search
+	locationLower := strings.ToLower(location)
 
 	// Set Defaults
 	if minC == 0 {
@@ -86,8 +89,30 @@ func FilterArtists(artists []types.Artist, r *http.Request) ([]types.Artist, typ
 			}
 		}
 
-		// Check 4: Location (Pending implementation)
+		// Check 4: Locations
+		if location != "" {
+			matchesLoc := false
 
+			for _, locData := range types.AllLocations.Index {
+				if locData.ID == a.ID {
+					for _, city := range locData.Locations {
+
+						cleanCity := strings.ReplaceAll(city, "_", " ")
+						cleanCity = strings.ReplaceAll(cleanCity, "-", " ")
+						cleanCity = strings.ToLower(cleanCity)
+
+						if strings.Contains(cleanCity, locationLower) {
+							matchesLoc = true
+							break
+						}
+					}
+					break
+				}
+			}
+			if !matchesLoc {
+				continue
+			}
+		}
 		filtered = append(filtered, a)
 	}
 

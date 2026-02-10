@@ -3,9 +3,12 @@ package types
 import "html/template"
 
 var (
-	Artists   []Artist
-	Templates *template.Template
+	Artists      []Artist
+	Templates    *template.Template
+	AllLocations LocationsIndex
 )
+
+// --- Data ---
 
 type Artist struct {
 	ID           int      `json:"id"`
@@ -29,6 +32,7 @@ type ArtistDetail struct {
 type Locations struct {
 	ID        int      `json:"id"`
 	Locations []string `json:"locations"`
+	Dates     string   `json:"dates"`
 }
 
 type Dates struct {
@@ -50,6 +54,10 @@ type FilterData struct {
 	FirstAlbumMax   int
 	Members         []string
 	Location        string
+}
+
+type LocationsIndex struct {
+	Index []Locations `json:"index"`
 }
 
 type IndexPageData struct {
