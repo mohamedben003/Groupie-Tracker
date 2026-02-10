@@ -40,7 +40,7 @@
                             </div>
                             <div class="range-slider-container">
                                 <div class="slider-track"></div>
-                                
+
                                 <input type="range" name="creationDateMin" min="1950" max="2025"
                                     value="{{if .Filters.CreationDateMin}}{{.Filters.CreationDateMin}}{{else}}1950{{end}}"
                                     id="slider-1">
@@ -136,6 +136,8 @@
         </section>
 
         <!-- Artists Grid -->
+        {{if .Artists}}
+
         <div class="artists-grid" id="artistsGrid">
             {{range .Artists}}
             <article class="artist-card" data-name="{{.Name}}">
@@ -163,10 +165,11 @@
             </article>
             {{end}}
         </div>
-
-        <div id="noResults" class="no-results" style="display: none;">
+        {{else}}
+        <div id="noResults" class="no-results">
             <p>No artists found matching your criteria.</p>
         </div>
+        {{end}}
     </main>
 
     <footer>
