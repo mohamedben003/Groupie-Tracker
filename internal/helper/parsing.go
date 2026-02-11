@@ -1,21 +1,29 @@
 package helper
 
 import (
-	"fmt"
-	types "grouping_tracker/internal/types"
+	"strings"
 )
-func ParseArtiste() error {
-		fmt.Println("artist befaure parsing ", types.Artists[0])
 
-	
-		dataLocation:=types.DataLocations.Index
-	for i := range types.Artists {
-		println("artist id ", types.Artists[i].ID)
+func CleanCityName(city string) string {
+	cleanCity := strings.ToLower(city)
+	cleanCity = strings.ReplaceAll(city, "_", " ")
+	cleanCity = strings.ReplaceAll(cleanCity, "-", " ")
+	cleanCity = strings.ToLower(cleanCity)
+	return cleanCity
+}
 
+func CleanEntry(entry string) string {
+	entry = strings.ToLower(entry)
 
-		types.Artists[i].LocationsData =
-			dataLocation[types.Artists[i].ID-1].Locations
-	}
+	entry = strings.ReplaceAll(entry, ", ", " ")
 
-return nil
+	entry = strings.TrimSpace(entry)
+	entry = strings.Join(strings.Fields(entry), " ")
+
+	return entry
+}
+
+func CheckLocation(cityName,LocationToFind string) bool {
+
+	return cityName == LocationToFind || strings.Contains(cityName, LocationToFind)
 }

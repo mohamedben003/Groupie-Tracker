@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"grouping_tracker/internal/helper"
 	"grouping_tracker/internal/types"
 )
 
@@ -30,8 +31,6 @@ func FilterArtists(artists []types.Artist, r *http.Request) ([]types.Artist, typ
 	members := r.Form["members"]
 	location := strings.TrimSpace(r.FormValue("location"))
 
-	//to send back the original location typed in the search
-	locationLower := strings.ToLower(location)
 
 	// Set Defaults
 	if minC == 0 {
@@ -92,16 +91,15 @@ func FilterArtists(artists []types.Artist, r *http.Request) ([]types.Artist, typ
 		// Check 4: Locations
 		if location != "" {
 			matchesLoc := false
+			locationToFind:=helper.CleanEntry(location)
 
 			for _, locData := range types.AllLocations.Index {
 				if locData.ID == a.ID {
 					for _, city := range locData.Locations {
 
-						cleanCity := strings.ReplaceAll(city, "_", " ")
-						cleanCity = strings.ReplaceAll(cleanCity, "-", " ")
-						cleanCity = strings.ToLower(cleanCity)
+                              cleanCity:=helper.CleanCityName(city)
 
-						if strings.Contains(cleanCity, locationLower) {
+						if helper.CheckLocation(cleanCity, locationToFind) {
 							matchesLoc = true
 							break
 						}
