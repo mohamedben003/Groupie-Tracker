@@ -1,673 +1,225 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Groupie Trackers - Discover Artists</title>
-    <link rel="stylesheet" href="/static/style.css" />
-    <link rel="stylesheet" href="/static/filter.css" />
-  </head>
-  <body>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
     <header>
-      <div class="container">
-        <h1>🎵 Groupie Trackers</h1>
-        <p class="tagline">
-          Discover your favorite artists and their tour dates
-        </p>
-      </div>
+        <div class="container">
+            <h1>🎵 Groupie Trackers</h1>
+            <p class="tagline">Discover your favorite artists and their tour dates</p>
+        </div>
     </header>
 
     <main class="container">
-      <!-- Filters Section -->
-      <section class="filters-section">
-        <div class="filters-header">
-          <h2>FILTERS</h2>
-          <div class="filter-actions">
-            <button type="button" class="btn-reset" id="resetFilters">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path
-                  d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"
-                ></path>
-                <path d="M3 3v5h5"></path>
-              </svg>
-              Reset All
-            </button>
-          </div>
+        <!-- Filter Section -->
+        <section class="filters-section">
+            <form action="/" method="GET" class="filter-form">
+                <div class="filter-header">
+                    <h2>Filter Artists</h2>
+                    <div class="form-actions">
+                        <a href="/" class="reset-btn">Reset</a>
+                        <button type="submit" class="apply-btn">Apply Filters</button>
+                    </div>
+                </div>
+
+                <div class="filter-grid">
+                    <!-- Range Filter: Creation Date -->
+                    <div class="filter-group">
+                        <label>Creation Date (Year)</label>
+
+                        <div class="double-slider-box">
+                            <div class="range-values">
+                                <!-- IDs needed for JS -->
+                                <span id="range1-display">1950</span> - <span id="range2-display">2025</span>
+                            </div>
+                            <div class="range-slider-container">
+                                <div class="slider-track"></div>
+
+                                <input type="range" name="creationDateMin" min="1950" max="2025"
+                                    value="{{if .Filters.CreationDateMin}}{{.Filters.CreationDateMin}}{{else}}1950{{end}}"
+                                    id="slider-1">
+
+                                <input type="range" name="creationDateMax" min="1950" max="2025"
+                                    value="{{if .Filters.CreationDateMax}}{{.Filters.CreationDateMax}}{{else}}2025{{end}}"
+                                    id="slider-2">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Range Filter: First Album Date -->
+                    <div class="filter-group">
+                        <label>First Album Date (Year)</label>
+                        <div class="range-container">
+                            <div class="range-inputs">
+                                <!-- GO INJECTION HERE -->
+                                <input type="number" name="firstAlbumMin" placeholder="1950" class="small-input"
+                                    min="1950" max="2025"
+                                    value="{{if .Filters.FirstAlbumMin}}{{.Filters.FirstAlbumMin}}{{end}}">
+                                <span>to</span>
+                                <input type="number" name="firstAlbumMax" placeholder="2025" class="small-input"
+                                    min="1950" max="2025"
+                                    value="{{if .Filters.FirstAlbumMax}}{{.Filters.FirstAlbumMax}}{{end}}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Checkbox Filter: Number of Members -->
+                    <div class="filter-group">
+                        <label>Number of Members</label>
+                        <div class="checkbox-grid">
+                            <div class="checkbox-grid">
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="members" value="1" {{range .Filters.Members}}{{if eq
+                                        . "1" }}checked{{end}}{{end}}>
+                                    <span>1</span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="members" value="2" {{range .Filters.Members}}{{if eq
+                                        . "2" }}checked{{end}}{{end}}>
+                                    <span>2</span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="members" value="3" {{range .Filters.Members}}{{if eq
+                                        . "3" }}checked{{end}}{{end}}>
+                                    <span>3</span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="members" value="4" {{range .Filters.Members}}{{if eq
+                                        . "4" }}checked{{end}}{{end}}>
+                                    <span>4</span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="members" value="5" {{range .Filters.Members}}{{if eq
+                                        . "5" }}checked{{end}}{{end}}>
+                                    <span>5</span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="members" value="6" {{range .Filters.Members}}{{if eq
+                                        . "6" }}checked{{end}}{{end}}>
+                                    <span>6</span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="members" value="7" {{range .Filters.Members}}{{if eq
+                                        . "7" }}checked{{end}}{{end}}>
+                                    <span>7</span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="members" value="8" {{range .Filters.Members}}{{if eq
+                                        . "8" }}checked{{end}}{{end}}>
+                                    <span>8+</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Location Filter -->
+                    <div class="filter-group">
+                        <label for="locationInput">Location</label>
+                        <input type="text" id="locationInput" name="location" placeholder="e.g. London, USA..."
+                            class="text-input" list="locationsList" value="{{.Filters.Location}}">
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <!-- Artists Grid -->
+        {{if .Artists}}
+
+        <div class="artists-grid" id="artistsGrid">
+            {{range .Artists}}
+            <article class="artist-card" data-name="{{.Name}}">
+                <a href="/artist/{{.ID}}" class="card-link">
+                    <div class="card-image">
+                        <img src="{{.Image}}" alt="{{.Name}}" loading="lazy">
+                        <div class="card-overlay">
+                            <span class="view-details">View Details →</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h2 class="artist-name">{{.Name}}</h2>
+                        <div class="artist-meta">
+                            <span class="meta-item">
+                                <span class="icon-calendar"></span>
+                                Since {{.CreationDate}}
+                            </span>
+                            <span class="meta-item">
+                                <span class="icon-users"></span>
+                                {{len .Members}} members
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </article>
+            {{end}}
         </div>
-
-        <div class="filter-grid">
-          <div class="filter-group">
-            <h3 class="filter-title">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z"
-                ></path>
-              </svg>
-              Career Starting Year
-            </h3>
-            <div class="range-filter">
-              <div class="range-inputs">
-                <div class="input-group">
-                  <label>From</label>
-                  <input
-                    type="number"
-                    id="creationDateMin"
-                    placeholder="1970"
-                    min="1900"
-                    max="2025"
-                  />
-                </div>
-                <div class="range-separator">–</div>
-                <div class="input-group">
-                  <label>To</label>
-                  <input
-                    type="number"
-                    id="creationDateMax"
-                    placeholder="2024"
-                    min="1900"
-                    max="2025"
-                  />
-                </div>
-              </div>
-              <div class="range-display">
-                <span id="creationRangeDisplay">1970 - 2024</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- First Album Filter -->
-          <div class="filter-group">
-            <h3 class="filter-title">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path
-                  d="M3 19V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
-                ></path>
-                <path d="M16 8V4"></path>
-                <path d="M8 8V4"></path>
-                <path d="M3 12h18"></path>
-              </svg>
-              First Album Year
-            </h3>
-            <div class="range-filter">
-              <div class="range-inputs">
-                <div class="input-group">
-                  <label>From</label>
-                  <input
-                    type="number"
-                    id="firstAlbumMin"
-                    placeholder="1970"
-                    min="1900"
-                    max="2025"
-                  />
-                </div>
-                <div class="range-separator">–</div>
-                <div class="input-group">
-                  <label>To</label>
-                  <input
-                    type="number"
-                    id="firstAlbumMax"
-                    placeholder="2024"
-                    min="1900"
-                    max="2025"
-                  />
-                </div>
-              </div>
-              <div class="range-display">
-                <span id="albumRangeDisplay">1970 - 2024</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Members Count Filter -->
-          <div class="filter-group">
-            <h3 class="filter-title">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-              </svg>
-              Number of Members
-            </h3>
-            <div class="member-filter">
-              <div class="member-inputs">
-                <div class="input-group">
-                  <label>Min</label>
-                  <input
-                    type="number"
-                    id="membersMin"
-                    placeholder="1"
-                    min="1"
-                    max="20"
-                  />
-                </div>
-                <div class="range-separator">–</div>
-                <div class="input-group">
-                  <label>Max</label>
-                  <input
-                    type="number"
-                    id="membersMax"
-                    placeholder="10"
-                    min="1"
-                    max="20"
-                  />
-                </div>
-              </div>
-              <div class="member-buttons">
-                <button type="button" class="member-btn" data-value="1">
-                  1
-                </button>
-                <button type="button" class="member-btn" data-value="2">
-                  2
-                </button>
-                <button type="button" class="member-btn" data-value="3">
-                  3
-                </button>
-                <button type="button" class="member-btn" data-value="4">
-                  4
-                </button>
-                <button type="button" class="member-btn" data-value="5">
-                  5
-                </button>
-                <button type="button" class="member-btn" data-value="6">
-                  6
-                </button>
-                <button type="button" class="member-btn" data-value="7">
-                  7+
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Locations Filter -->
-          <div class="filter-group">
-            <h3 class="filter-title">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                <circle cx="12" cy="10" r="3"></circle>
-              </svg>
-              Concert Locations
-            </h3>
-            <div class="locations-filter">
-              <div class="locations-search">
-                <input
-                  type="text"
-                  id="locationSearch"
-                  placeholder="Search locations..."
-                  autocomplete="off"
-                />
-              </div>
-              <div class="locations-grid" id="locationsGrid">
-                <!-- Locations will be populated by JavaScript -->
-                <div class="location-placeholder">
-                  <p>Loading locations...</p>
-                </div>
-              </div>
-              <div class="locations-controls">
-                <button
-                  type="button"
-                  class="btn-select-all"
-                  id="selectAllLocations"
-                >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                  </svg>
-                  Select All
-                </button>
-                <button type="button" class="btn-clear" id="clearAllLocations">
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
-                  Clear All
-                </button>
-              </div>
-            </div>
-          </div>
+        {{else}}
+        <div id="noResults" class="no-results">
+            <p>No artists found matching your criteria.</p>
         </div>
-      </section>
-
-      <!-- Search Section -->
-      <div class="search-section">
-        <div class="search-wrapper">
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="Search artists by name..."
-            autocomplete="off"
-          />
-        </div>
-      </div>
-
-      <!-- Results Count -->
-      <div class="results-info">
-        <span id="resultsCount">Loading artists...</span>
-      </div>
-
-      <!-- Artists Grid -->
-      <div class="artists-grid" id="artistsGrid">
-        {{range .}}
-        <article
-          class="artist-card"
-          data-name="{{.Name}}"
-          data-creation-date="{{.CreationDate}}"
-          data-first-album="{{.FirstAlbum}}"
-          data-members="{{len .Members}}"
-          data-locations="{{range $i, $loc := .LocationsData}}{{if $i}}|{{end}}{{$loc}}{{end}}"
-        >
-          <a href="/artist/{{.ID}}" class="card-link">
-            <div class="card-image">
-              <img src="{{.Image}}" alt="{{.Name}}" loading="lazy" />
-              <div class="card-overlay">
-                <span class="view-details">View Details →</span>
-              </div>
-            </div>
-            <div class="card-content">
-              <h2 class="artist-name">{{.Name}}</h2>
-              <div class="artist-meta">
-                <span class="meta-item">
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <rect
-                      x="3"
-                      y="4"
-                      width="18"
-                      height="18"
-                      rx="2"
-                      ry="2"
-                    ></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                  </svg>
-                  Since {{.CreationDate}}
-                </span>
-                <span class="meta-item">
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path
-                      d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-                    ></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                    <polyline points="10 9 9 9 8 9"></polyline>
-                  </svg>
-                  First Album: {{.FirstAlbum}}
-                </span>
-                <span class="meta-item">
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="9" cy="7" r="4"></circle>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                  </svg>
-                  {{len .Members}} members
-                </span>
-              </div>
-            </div>
-          </a>
-        </article>
         {{end}}
-      </div>
-
-      <!-- No Results Message -->
-      <div id="noResults" class="no-results" style="display: none">
-        <svg
-          width="48"
-          height="48"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="15" y1="9" x2="9" y2="15"></line>
-          <line x1="9" y1="9" x2="15" y2="15"></line>
-        </svg>
-        <h3>No artists found</h3>
-        <p>Try adjusting your filters or search terms</p>
-      </div>
     </main>
 
     <footer>
-      <div class="container">
-        <p>&copy; 2026 Groupie Trackers. Built with Go.</p>
-      </div>
+        <div class="container">
+            <p>&copy; 2026 Groupie Trackers.</p>
+        </div>
     </footer>
 
-    <script type="module">
-      // Import the data from your external file
-      import dataLocation from "/static/data.js";
+    <script>
+        // This script is to handle the two Sliders (range)
+        window.onload = function () {
+            const slider1 = document.getElementById("slider-1");
+            const slider2 = document.getElementById("slider-2");
+            const display1 = document.getElementById("range1-display");
+            const display2 = document.getElementById("range2-display");
+            const track = document.querySelector(".slider-track");
+            const minGap = 0;
 
-      // Your existing script code, now with access to dataLocation
-      const searchInput = document.getElementById("searchInput");
-      const artistsGrid = document.getElementById("artistsGrid");
-      const noResults = document.getElementById("noResults");
-      const resultsCount = document.getElementById("resultsCount");
-      const artistCards = Array.from(document.querySelectorAll(".artist-card"));
-
-      const resetFiltersBtn = document.getElementById("resetFilters");
-      const selectAllLocationsBtn =
-        document.getElementById("selectAllLocations");
-      const clearAllLocationsBtn = document.getElementById("clearAllLocations");
-      const locationSearch = document.getElementById("locationSearch");
-      const memberButtons = document.querySelectorAll(".member-btn");
-
-      // Use the imported dataLocation instead of sampleLocations
-      const allLocations = dataLocation; // This should be your array of {value, title} objects
-
-      function initLocations() {
-        const locationsGrid = document.getElementById("locationsGrid");
-        locationsGrid.innerHTML = "";
-
-        // Get only unique locations (remove duplicates)
-        const uniqueLocations = Array.from(
-          new Map(allLocations.map((item) => [item.value, item])).values(),
-        );
-
-        uniqueLocations.forEach((location) => {
-          const locationItem = document.createElement("div");
-          locationItem.className = "location-item";
-
-          const checkbox = document.createElement("input");
-          checkbox.type = "checkbox";
-          checkbox.id = `loc-${location.value.replace(/[^a-zA-Z0-9]/g, "-")}`;
-          checkbox.value = location.value;
-          checkbox.dataset.title = location.title;
-
-          const label = document.createElement("label");
-          label.htmlFor = checkbox.id;
-          label.textContent = location.title;
-
-          locationItem.appendChild(checkbox);
-          locationItem.appendChild(label);
-          locationsGrid.appendChild(locationItem);
-        });
-      }
-
-      // The rest of your existing functions remain the same...
-      function updateRangeDisplays() {
-        const creationMin =
-          document.getElementById("creationDateMin").value || "1970";
-        const creationMax =
-          document.getElementById("creationDateMax").value || "2024";
-        const albumMin =
-          document.getElementById("firstAlbumMin").value || "1970";
-        const albumMax =
-          document.getElementById("firstAlbumMax").value || "2024";
-
-        document.getElementById("creationRangeDisplay").textContent =
-          `${creationMin} - ${creationMax}`;
-        document.getElementById("albumRangeDisplay").textContent =
-          `${albumMin} - ${albumMax}`;
-      }
-
-      function applyFilters() {
-        const searchTerm = searchInput.value.toLowerCase().trim();
-
-        // Get filter values
-        const creationMin = document.getElementById("creationDateMin").value;
-        const creationMax = document.getElementById("creationDateMax").value;
-        const albumMin = document.getElementById("firstAlbumMin").value;
-        const albumMax = document.getElementById("firstAlbumMax").value;
-        const membersMin = document.getElementById("membersMin").value;
-        const membersMax = document.getElementById("membersMax").value;
-
-        // Get selected member button
-        const selectedMemberBtn = document.querySelector(".member-btn.active");
-        const selectedMemberValue = selectedMemberBtn
-          ? selectedMemberBtn.dataset.value
-          : null;
-
-        // Get selected locations
-        const selectedLocations = Array.from(
-          document.querySelectorAll(
-            '.location-item input[type="checkbox"]:checked',
-          ),
-        ).map((cb) => cb.value);
-
-        let visibleCount = 0;
-
-        artistCards.forEach((card) => {
-          const artistName = card.dataset.name.toLowerCase();
-          const creationDate = parseInt(card.dataset.creationDate);
-          const firstAlbum = parseInt(card.dataset.firstAlbum.split("-").pop());
-          const members = parseInt(card.dataset.members);
-          const artistLocations = card.dataset.locations;
-
-          let matches = true;
-
-          // Search filter
-          if (searchTerm && !artistName.includes(searchTerm)) {
-            matches = false;
-          }
-
-          // Creation date range
-          if (creationMin && creationDate < parseInt(creationMin))
-            matches = false;
-          if (creationMax && creationDate > parseInt(creationMax))
-            matches = false;
-
-          // First album range
-          if (albumMin && firstAlbum < parseInt(albumMin)) matches = false;
-          if (albumMax && firstAlbum > parseInt(albumMax)) matches = false;
-
-          // Members filter
-          if (membersMin && members < parseInt(membersMin)) matches = false;
-          if (membersMax && members > parseInt(membersMax)) matches = false;
-
-          // Member button selection
-          if (selectedMemberValue) {
-            if (selectedMemberValue === "7+") {
-              if (members < 7) matches = false;
-            } else {
-              if (members !== parseInt(selectedMemberValue)) matches = false;
-            }
-          }
-
-          // Locations filter - check if artist has ANY of the selected locations
-          if (selectedLocations.length > 0) {
-            // Parse the locations string from data attribute
-            let artistLocationArray = [];
-            try {
-              artistLocationArray = JSON.parse(artistLocations);
-            } catch (e) {
-              // If not JSON, assume it's a string representation
-              artistLocationArray = artistLocations ? [artistLocations] : [];
+            function slideOne() {
+                if (parseInt(slider2.value) - parseInt(slider1.value) <= minGap) {
+                    slider1.value = parseInt(slider2.value) - minGap;
+                }
+                display1.textContent = slider1.value;
+                fillColor();
             }
 
-            const hasLocation = selectedLocations.some((selectedLoc) =>
-              artistLocationArray.some((artistLoc) =>
-                artistLoc.includes(selectedLoc),
-              ),
-            );
-            if (!hasLocation) matches = false;
-          }
+            function slideTwo() {
+                if (parseInt(slider2.value) - parseInt(slider1.value) <= minGap) {
+                    slider2.value = parseInt(slider1.value) + minGap;
+                }
+                display2.textContent = slider2.value;
+                fillColor();
+            }
 
-          // Show/hide card
-          card.style.display = matches ? "block" : "none";
-          if (matches) visibleCount++;
-        });
+            function fillColor() {
+                const min = parseInt(slider1.min);
+                const max = parseInt(slider1.max);
+                const percent1 = ((slider1.value - min) / (max - min)) * 100;
+                const percent2 = ((slider2.value - min) / (max - min)) * 100;
+                track.style.background = `linear-gradient(to right, var(--border) ${percent1}%, var(--primary) ${percent1}%, var(--primary) ${percent2}%, var(--border) ${percent2}%)`;
+            }
 
-        // Update UI
-        resultsCount.textContent = `${visibleCount} artist${visibleCount !== 1 ? "s" : ""} found`;
+            slider1.addEventListener("input", slideOne);
+            slider2.addEventListener("input", slideTwo);
 
-        if (visibleCount === 0) {
-          artistsGrid.style.display = "none";
-          noResults.style.display = "flex";
-        } else {
-          artistsGrid.style.display = "grid";
-          noResults.style.display = "none";
-        }
-
-        updateRangeDisplays();
-      }
-
-      // Reset all filters
-      function resetFilters() {
-        searchInput.value = "";
-        locationSearch.value = "";
-
-        // Reset range inputs
-        document.getElementById("creationDateMin").value = "";
-        document.getElementById("creationDateMax").value = "";
-        document.getElementById("firstAlbumMin").value = "";
-        document.getElementById("firstAlbumMax").value = "";
-        document.getElementById("membersMin").value = "";
-        document.getElementById("membersMax").value = "";
-
-        // Reset member buttons
-        memberButtons.forEach((btn) => btn.classList.remove("active"));
-
-        // Reset location checkboxes
-        document
-          .querySelectorAll('.location-item input[type="checkbox"]')
-          .forEach((cb) => {
-            cb.checked = false;
-          });
-
-        applyFilters();
-      }
-
-      // Initialize
-      document.addEventListener("DOMContentLoaded", () => {
-        initLocations();
-        applyFilters();
-
-        // Event listeners
-        searchInput.addEventListener("input", applyFilters);
-        resetFiltersBtn.addEventListener("click", resetFilters);
-
-        selectAllLocationsBtn.addEventListener("click", () => {
-          document
-            .querySelectorAll('.location-item input[type="checkbox"]')
-            .forEach((cb) => {
-              cb.checked = true;
-            });
-          applyFilters();
-        });
-
-        clearAllLocationsBtn.addEventListener("click", () => {
-          document
-            .querySelectorAll('.location-item input[type="checkbox"]')
-            .forEach((cb) => {
-              cb.checked = false;
-            });
-          applyFilters();
-        });
-
-        // Range inputs
-        document.querySelectorAll(".range-inputs input").forEach((input) => {
-          input.addEventListener("input", applyFilters);
-        });
-
-        // Member buttons
-        memberButtons.forEach((btn) => {
-          btn.addEventListener("click", () => {
-            const isActive = btn.classList.contains("active");
-            memberButtons.forEach((b) => b.classList.remove("active"));
-            if (!isActive) btn.classList.add("active");
-            applyFilters();
-          });
-        });
-
-        // Location search
-        locationSearch.addEventListener("input", (e) => {
-          const term = e.target.value.toLowerCase();
-          document.querySelectorAll(".location-item").forEach((item) => {
-            const label = item.querySelector("label").textContent.toLowerCase();
-            item.style.display = label.includes(term) ? "flex" : "none";
-          });
-        });
-
-        // Location checkbox changes
-        document.addEventListener("change", (e) => {
-          if (e.target.matches('.location-item input[type="checkbox"]')) {
-            applyFilters();
-          }
-        });
-      });
+            // Trigger once on load to set colors based on Go values
+            slideOne();
+            slideTwo();
+        };
     </script>
-  </body>
+</body>
+
 </html>

@@ -5,9 +5,10 @@ import (
 	"net/http"
 	"strconv"
 
-	api "grouping_tracker/internal/api"
-	render "grouping_tracker/internal/render"
-	types "grouping_tracker/internal/types"
+	"grouping_tracker/internal/api"
+	"grouping_tracker/internal/filters" // Import the new package
+	"grouping_tracker/internal/render"
+	"grouping_tracker/internal/types"
 )
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
@@ -20,11 +21,18 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := types.Templates.ExecuteTemplate(w, "index.html", types.Artists)
+	// Call the separate filters package
+	filteredArtists, currentFilters := filters.FilterArtists(types.Artists, r)
+
+	data := types.IndexPageData{
+		Artists: filteredArtists,
+		Filters: currentFilters,
+	}
+
+	err := types.Templates.ExecuteTemplate(w, "index.html", data)
 	if err != nil {
 		log.Printf("Template execution error: %v", err)
 		render.Render500(w)
-		return
 	}
 }
 

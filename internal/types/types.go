@@ -1,16 +1,14 @@
-package internal
+package types
 
 import "html/template"
 
 var (
-	Artists   []Artist
-	Templates *template.Template
-	DataLocations LocationsResponse
+	Artists      []Artist
+	Templates    *template.Template
+	AllLocations LocationsIndex
 )
 
-type LocationsResponse struct {
-	Index []Locations `json:"index"`
-}
+// --- Data ---
 
 type Artist struct {
 	ID           int      `json:"id"`
@@ -20,13 +18,9 @@ type Artist struct {
 	CreationDate int      `json:"creationDate"`
 	FirstAlbum   string   `json:"firstAlbum"`
 	Locations    string   `json:"locations"`
-	LocationsData []string 
 	ConcertDates string   `json:"concertDates"`
 	Relations    string   `json:"relations"`
 }
-
-
-
 
 type ArtistDetail struct {
 	Artist
@@ -38,6 +32,7 @@ type ArtistDetail struct {
 type Locations struct {
 	ID        int      `json:"id"`
 	Locations []string `json:"locations"`
+	Dates     string   `json:"dates"`
 }
 
 type Dates struct {
@@ -48,6 +43,26 @@ type Dates struct {
 type Relations struct {
 	ID             int                 `json:"id"`
 	DatesLocations map[string][]string `json:"datesLocations"`
+}
+
+// --- Filters ---
+
+type FilterData struct {
+	CreationDateMin int
+	CreationDateMax int
+	FirstAlbumMin   int
+	FirstAlbumMax   int
+	Members         []string
+	Location        string
+}
+
+type LocationsIndex struct {
+	Index []Locations `json:"index"`
+}
+
+type IndexPageData struct {
+	Artists []Artist
+	Filters FilterData
 }
 
 // --- Err pages ---

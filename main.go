@@ -20,8 +20,14 @@ func main() {
 		log.Fatal("Error loading templates:", err)
 	}
 
-	if err := api.FetchStartData(); err != nil {
+	// For the artists's fetch
+	if err := api.FetchData("https://groupietrackers.herokuapp.com/api/artists", &types.Artists); err != nil {
 		log.Fatal("Error fetching artists:", err)
+	}
+
+	// For the locations's fetch
+	if err := api.FetchData("https://groupietrackers.herokuapp.com/api/locations", &types.AllLocations); err != nil {
+		log.Fatal("Error fetching locations:", err)
 	}
 
 	fs := http.FileServer(http.Dir("static"))
@@ -36,7 +42,7 @@ func main() {
 			return
 		}
 
-		// 🚫 Block directory listing
+		// Block directory listing
 		if info.IsDir() {
 			w.WriteHeader(http.StatusNotFound)
 			render.Render404(w)
